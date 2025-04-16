@@ -209,11 +209,10 @@
           const urlObj = new URL(link);
           let ridParam = urlObj.searchParams.get('rid') || "";
           
+          // Decode and keep original padding
           ridParam = decodeURIComponent(ridParam);
-          if (ridParam.endsWith("==")) {
-            ridParam = ridParam.slice(0, -2);
-          }
-
+          
+          // Decode Base64 with original padding
           let decoded;
           try {
             decoded = atob(ridParam);
@@ -231,9 +230,9 @@
 
           rollNos.forEach(r => {
             const newRaw = `${part1},${testId},${r}`;
+            // Let btoa() handle padding automatically
             const newEncoded = btoa(newRaw);
-            const finalRid = newEncoded + "==";
-            urlObj.searchParams.set('rid', finalRid);
+            urlObj.searchParams.set('rid', newEncoded);
             generatedLinks.push(urlObj.toString());
           });
         } catch (e) {
