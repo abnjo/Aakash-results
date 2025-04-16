@@ -1,314 +1,148 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Result Redirector</title>
-  <!-- Using Roboto for that clean, modern look -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
-    rel="stylesheet"
-  />
+  <!-- Monospace font for a code-style vibe -->
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Mono&display=swap" rel="stylesheet" />
   <style>
-    /* 
-      Animated Gemini-inspired gradient background
-      Adjust the colors or animation duration as desired.
-    */
     @keyframes geminiGradient {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
-    }
+    }body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Fira Mono', monospace;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Roboto', sans-serif;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+  background: linear-gradient(
+    -45deg,
+    #1e2a45,
+    #361c4d,
+    #301c3a,
+    #152d44
+  );
+  background-size: 400% 400%;
+  animation: geminiGradient 15s ease infinite;
+}
 
-      /* "Gemini" color vibe: bluish to pinkish/purple gradient. */
-      background: linear-gradient(
-        -45deg,
-        #4b6fff,
-        #b44fdc,
-        #ff79c6,
-        #308de4
-      );
-      background-size: 400% 400%;
-      animation: geminiGradient 15s ease infinite;
-    }
+.container {
+  width: 90%;
+  max-width: 500px;
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  padding: 2rem;
+}
 
-    .container {
-      /* Glassy, blurred container */
-      width: 90%;
-      max-width: 500px;
-      background: rgba(20, 20, 20, 0.6);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-      padding: 2rem;
-    }
+.input-group {
+  margin-bottom: 1.5rem;
+}
 
-    .input-group {
-      margin-bottom: 1.5rem;
-    }
+.input-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #c2ddff;
+}
 
-    .input-group label {
-      display: block;
-      font-weight: 500;
-      margin-bottom: 0.5rem;
-      /* Slight emphasis color */
-      color: #c2ddff;
-    }
+.input-group input[type="text"] {
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 1rem;
+  font-family: 'Fira Mono', monospace;
+  outline: none;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+  transition: background 0.3s, box-shadow 0.3s;
+}
 
-    .input-group input[type="text"] {
-      width: 100%;
-      padding: 0.8rem;
-      border: none;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.1);
-      color: #ffffff;
-      font-size: 1rem;
-      outline: none;
-      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
-      transition: background 0.3s, box-shadow 0.3s;
-    }
-    .input-group input[type="text"]:focus {
-      background: rgba(255, 255, 255, 0.2);
-      box-shadow: inset 0 0 8px rgba(196, 79, 220, 0.8);
-    }
+.input-group input[type="text"]::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+}
 
-    /* Radio buttons grouped side by side */
-    .radio-group {
-      margin-top: 0.5rem;
-      display: flex;
-      gap: 1rem;
-    }
+.input-group input[type="text"]:focus {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 0 8px rgba(196, 79, 220, 0.8);
+}
 
-    .radio-group label {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      gap: 0.4rem;
-      color: #ffffff;
-      font-weight: 400;
-    }
+.radio-group {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 1rem;
+}
 
-    .radio-group input[type="radio"] {
-      accent-color: #b44fdc; /* Purple/pink accent */
-      transform: scale(1.1);
-      cursor: pointer;
-    }
+.radio-group label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 0.4rem;
+  color: #ffffff;
+  font-weight: 400;
+}
 
-    .btn {
-      display: inline-block;
-      width: 100%;
-      padding: 0.8rem 1.6rem;
-      font-size: 1rem;
-      font-weight: 500;
-      color: #ffffff;
-      background: rgba(180, 79, 220, 0.7);
-      border: none;
-      border-radius: 8px;
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
-      margin-top: 1rem;
-    }
-    .btn:hover {
-      background: rgba(180, 79, 220, 0.9);
-      transform: translateY(-2px);
-    }
+.radio-group input[type="radio"] {
+  accent-color: #b44fdc;
+  transform: scale(1.1);
+  cursor: pointer;
+}
 
-    .results-list {
-      margin-top: 1.5rem;
-      word-wrap: break-word;
-    }
+.btn {
+  display: inline-block;
+  width: 100%;
+  padding: 0.8rem 1.6rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+  background: rgba(180, 79, 220, 0.7);
+  border: none;
+  border-radius: 8px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  margin-top: 1rem;
+  font-family: 'Fira Mono', monospace;
+}
 
-    .results-list a {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: #c2ddff;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s;
-    }
-    .results-list a:hover {
-      color: #ffffff;
-    }
+.btn:hover {
+  background: rgba(180, 79, 220, 0.9);
+  transform: translateY(-2px);
+}
+
+.results-list {
+  margin-top: 1.5rem;
+  word-wrap: break-word;
+}
+
+.results-list a {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #c2ddff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.results-list a:hover {
+  color: #ffffff;
+}
+
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Roll No Input -->
-    <div class="input-group">
-      <label for="rollNo">Roll No</label>
-      <input
-        type="text"
-        id="rollNo"
-        placeholder="Enter Roll No or comma-separated list"
-      />
-      <div class="radio-group">
-        <label>
-          <input
-            type="radio"
-            name="rollMode"
-            value="single"
-            checked
-          />
-          Single
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="rollMode"
-            value="list"
-          />
-          List
-        </label>
-      </div>
-    </div>
-
-    <!-- Link Input -->
-    <div class="input-group">
-      <label for="link">Link</label>
-      <input
-        type="text"
-        id="link"
-        placeholder="Enter URL e.g. http://aakashleap.com:3131/API/ResultRpt?rid=MSwxMDUyNTM0LDE0MTIzMTEyMTQ0MA%3D%3D"
-      />
-      <div class="radio-group">
-        <label>
-          <input
-            type="radio"
-            name="linkMode"
-            value="single"
-            checked
-          />
-          Single
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="linkMode"
-            value="list"
-          />
-          List
-        </label>
-      </div>
-    </div>
-
-    <!-- Generate Button -->
-    <button class="btn" id="resultsBtn">Results</button>
-
-    <!-- Results List -->
-    <div class="results-list" id="resultsList"></div>
-  </div>
-
-  <script>
-    function generateLinks() {
-      // Grab the user’s rollNo input & link input
-      const rollNoInput = document.getElementById('rollNo').value.trim();
-      const linkInput = document.getElementById('link').value.trim();
-
-      // Determine whether to treat them as single or list
-      const rollMode = document.querySelector('input[name="rollMode"]:checked').value;
-      const linkMode = document.querySelector('input[name="linkMode"]:checked').value;
-
-      // Split into arrays if user selected "list"
-      const rollNos = (rollMode === 'list')
-        ? rollNoInput.split(',').map(x => x.trim()).filter(Boolean)
-        : [rollNoInput];
-
-      const links = (linkMode === 'list')
-        ? linkInput.split(',').map(x => x.trim()).filter(Boolean)
-        : [linkInput];
-
-      // Build final array of generated URLs
-      const generatedLinks = [];
-
-      links.forEach(link => {
-        try {
-          const urlObj = new URL(link);
-          let ridParam = urlObj.searchParams.get('rid') || "";
-
-          // Decode the param once to remove safe characters
-          ridParam = decodeURIComponent(ridParam);
-          // Remove trailing "=="
-          if (ridParam.endsWith("==")) {
-            ridParam = ridParam.slice(0, -2);
-          }
-
-          // Convert from Base64 => raw string (e.g. "1,testid,rollno")
-          let decoded;
-          try {
-            decoded = atob(ridParam);
-          } catch (err) {
-            alert("Error decoding the Base64 string. Check the input link: " + link);
-            return;
-          }
-
-          const parts = decoded.split(',');
-          if (parts.length !== 3) {
-            alert("Decoded string isn't in expected format (1,testid,rollno). Link: " + link);
-            return;
-          }
-          const [part1, testId] = parts;
-
-          // For each roll no, re-encode with the new roll
-          rollNos.forEach(r => {
-            const newRaw = `${part1},${testId},${r}`;
-            const newEncoded = btoa(newRaw);
-
-            // Instead of encoding "==", directly append "%3D%3D"
-            const finalRid = newEncoded + "%3D%3D";
-            urlObj.searchParams.set('rid', finalRid);
-            generatedLinks.push(urlObj.toString());
-          });
-        } catch (e) {
-          alert("Invalid URL: " + link);
-        }
-      });
-
-      return generatedLinks;
-    }
-
-    document.getElementById('resultsBtn').addEventListener('click', () => {
-      const links = generateLinks();
-      const resultsListDiv = document.getElementById('resultsList');
-      resultsListDiv.innerHTML = "";
-
-      if (links.length === 0) {
-        resultsListDiv.innerHTML = "<p>No valid links generated.</p>";
-        return;
-      }
-
-      if (links.length === 1) {
-        // Auto-redirect if there's only one
-        window.location.href = links[0];
-      } else {
-        // Otherwise, display them
-        const info = document.createElement('p');
-        info.textContent = "Multiple links generated:";
-        resultsListDiv.appendChild(info);
-
-        links.forEach(link => {
-          const a = document.createElement('a');
-          a.href = link;
-          a.target = "_blank";
-          a.textContent = link;
-          resultsListDiv.appendChild(a);
-        });
-      }
-    });
-  </script>
+  <!-- Your HTML content here -->
 </body>
 </html>
