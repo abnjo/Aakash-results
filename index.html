@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Result Redirector</title>
+  <!-- Material Design Fonts & Icons -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <style>
+    /* Material 3 inspired minimal styling */
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .input-group input[type="text"],
+    .input-group textarea {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      margin-right: 0.5rem;
+    }
+
+    .btn {
+      background-color: #6200ee;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.6rem;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 4px;
+      width: 100%;
+    }
+
+    .btn:hover {
+      background-color: #4500b5;
+    }
+
+    .results-list {
+      margin-top: 1.5rem;
+    }
+
+    .results-list a {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #6200ee;
+      text-decoration: none;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- First input: PSID -->
+    <div class="input-group">
+      <label for="psid">PSID</label>
+      <input type="text" id="psid" placeholder="Enter PSID or list (comma-separated)" />
+      <div class="checkbox-group">
+        <input type="checkbox" id="listPsidsCheckbox" />
+        <label for="listPsidsCheckbox">list: psids</label>
+      </div>
+    </div>
+
+    <!-- Second input: Link -->
+    <div class="input-group">
+      <label for="link">Link</label>
+      <input type="text" id="link" placeholder="Enter URL e.g. http://aakashleap.com:3131/API/ResultRpt?rid=MSwxMDUyNTM0LDE0MTIzMTEyMTQ0MA%3D%3D" />
+      <div class="checkbox-group">
+        <input type="checkbox" id="listLinksCheckbox" />
+        <label for="listLinksCheckbox">list: links</label>
+      </div>
+    </div>
+
+    <button class="btn" id="resultsBtn">Results</button>
+    <div class="results-list" id="resultsList"></div>
+  </div>
+
+  <script>
+    // Function to generate new links based on inputs
+    function generateLinks() {
+      const psidInput = document.getElementById('psid').value;
+      const linkInput = document.getElementById('link').value;
+      const listPsids = document.getElementById('listPsidsCheckbox').checked;
+      const listLinks = document.getElementById('listLinksCheckbox').checked;
+      
+      // Get array of psids and links
+      const psids = listPsids ? psidInput.split(',').map(x => x.trim()).filter(x => x) : [psidInput.trim()];
+      const links = listLinks ? linkInput.split(',').map(x => x.trim()).filter(x => x) : [linkInput.trim()];
+      
+      const generatedLinks = [];
+      
+      // Process each link
+      links.forEach(link => {
+        try {
+          const urlObj = new URL(link);
+          // Get the rid parameter value from the URL
+          let ridParam = urlObj.searchParams.get('rid') || "";
+          // Remove trailing '%3D%3D' if present (decode first)
+          ridParam = decodeURIComponent(ridParam);
+          if (ridParam.endsWith("==")) {
+            ridParam = ridParam.slice(0, -2);
+          }
+          
+          // Decode the Base64 to get the raw string e.g., "1,testid,141231121440"
+          let decoded;
+          try {
+            decoded = atob(ridParam);
+          } catch (error) {
+            alert('Error decoding the Base64 string. Please check the input link.');
+            return;
+          }
+          const parts = decoded.split(',');
+          // Ensure the format is as expected (three parts)
+          if (parts.length !== 3) {
+            alert('The decoded string does not have the expected format (1,testid,psid).');
+            return;
+          }
+          const [part1, testId] = parts;
+          
+          // For each PSID provided, update the string and generate a new link.
+          psids.forEach(newPsid => {
+            const newRaw = `${part1},${testId},${newPsid}`;
+            const newEncoded = btoa(newRaw);
+            // Set the new rid value and manually append the encoded padding (%3D%3D)
+            const finalRid = encodeURIComponent(newEncoded) + "%3D%3D";
+            urlObj.searchParams.set('rid', finalRid);
+            generatedLinks.push(urlObj.toString());
+          });
+        } catch (e) {
+          alert("Invalid URL: " + link);
+        }
+      });
+      
+      return generatedLinks;
+    }
+    
+    document.getElementById('resultsBtn').addEventListener('click', () => {
+      const links = generateLinks();
+      const resultsListDiv = document.getElementById('resultsList');
+      resultsListDiv.innerHTML = ""; // clear previous
+      
+      if (links.length === 0) {
+        resultsListDiv.innerHTML = "<p>No valid links generated.</p>";
+        return;
+      }
+      
+      // If there's only one generated link, redirect immediately.
+      if (links.length === 1) {
+        window.location.href = links[0];
+      } else {
+        // Otherwise, display all generated links.
+        const info = document.createElement('p');
+        info.textContent = "Multiple links generated:";
+        resultsListDiv.appendChild(info);
+        
+        links.forEach(link => {
+          const a = document.createElement('a');
+          a.href = link;
+          a.target = "_blank";
+          a.textContent = link;
+          resultsListDiv.appendChild(a);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
