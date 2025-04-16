@@ -8,182 +8,149 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <style>
-    /* Global styles and gradient background */
+    /* Animated moving gradient background */
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  
     body {
       font-family: 'Roboto', sans-serif;
       margin: 0;
-      padding: 2rem;
+      padding: 0;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      transition: background-color 0.3s, color 0.3s;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+      background: linear-gradient(135deg, #0d0d0d, #1a1a1a, #333333);
+      background-size: 400% 400%;
+      animation: gradientAnimation 15s ease infinite;
+      color: #e0e0e0;
     }
     
-    /* Container with blur and increased corner rounding */
+    /* Glassmorphism container */
     .container {
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(20, 20, 20, 0.75);
       padding: 2rem;
-      border-radius: 16px;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      border-radius: 20px;
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
       max-width: 500px;
-      width: 100%;
+      width: 90%;
       position: relative;
+      border: 1px solid rgba(0, 176, 240, 0.5);
     }
 
     .input-group {
       margin-bottom: 1.5rem;
     }
-
+    
     .input-group label {
       display: block;
       margin-bottom: 0.5rem;
       font-weight: 500;
+      color: #00B0F0;
     }
-
-    .input-group input[type="text"],
-    .input-group textarea {
+    
+    .input-group input[type="text"] {
       width: 100%;
       padding: 0.8rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      border: none;
+      border-radius: 8px;
       font-size: 1rem;
-      background-color: rgba(255, 255, 255, 0.9);
-      transition: border-color 0.2s;
-    }
-
-    .input-group input[type="text"]:focus,
-    .input-group textarea:focus {
+      background: rgba(255, 255, 255, 0.1);
+      color: #e0e0e0;
       outline: none;
-      border-color: #6200ee;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+      transition: background 0.3s, box-shadow 0.3s;
     }
-
-    .checkbox-group {
-      display: flex;
+    
+    .input-group input[type="text"]:focus {
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: inset 0 0 8px rgba(0, 176, 240, 0.8);
+    }
+    
+    /* Inline checkboxes */
+    .checkbox-inline {
+      display: inline-flex;
       align-items: center;
       margin-top: 0.5rem;
     }
-
-    .checkbox-group input[type="checkbox"] {
-      margin-right: 0.5rem;
+    .checkbox-inline input[type="checkbox"] {
+      margin-right: 0.3rem;
+      accent-color: #00B0F0;
     }
-
+    
+    /* Glassmorphism button */
     .btn {
-      background-color: #6200ee;
-      color: white;
+      background: rgba(0, 176, 240, 0.5);
+      color: #ffffff;
       border: none;
       padding: 0.8rem 1.6rem;
       font-size: 1rem;
       cursor: pointer;
-      border-radius: 4px;
+      border-radius: 8px;
       width: 100%;
-      transition: background-color 0.3s;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      transition: background 0.3s, transform 0.2s;
     }
-
+    
     .btn:hover {
-      background-color: #4500b5;
+      background: rgba(0, 176, 240, 0.7);
+      transform: translateY(-2px);
     }
-
+    
     .results-list {
       margin-top: 1.5rem;
+      word-break: break-all;
     }
-
+    
     .results-list a {
       display: block;
       margin-bottom: 0.5rem;
-      color: #6200ee;
+      color: #00B0F0;
       text-decoration: none;
       font-weight: 500;
     }
-
-    /* Dark mode styles */
-    .dark-mode {
-      background: linear-gradient(135deg, #434343 0%, #000000 100%);
-      color: #e0e0e0;
-    }
-
-    .dark-mode .container {
-      background: rgba(30, 30, 30, 0.7);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8);
-    }
-
-    .dark-mode .input-group input[type="text"],
-    .dark-mode .input-group textarea {
-      background-color: rgba(50, 50, 50, 0.9);
-      color: #e0e0e0;
-      border: 1px solid #555;
-    }
-
-    .dark-mode .input-group input[type="text"]:focus,
-    .dark-mode .input-group textarea:focus {
-      border-color: #bb86fc;
-    }
-
-    .dark-mode .btn {
-      background-color: #bb86fc;
-      color: #121212;
-    }
-
-    .dark-mode .btn:hover {
-      background-color: #985eff;
-    }
-
-    /* Dark mode toggle switch */
-    .dark-mode-toggle {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-    }
     
-    .dark-mode-toggle input {
-      margin-right: 0.5rem;
-    }
+    /* Remove dark mode toggle (default dark mode) */
+    /* Optional: if you want any additional custom styling using images in the palette,
+       you can set a background-image or use extra colors here. */
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Dark Mode Toggle -->
-    <div class="dark-mode-toggle">
-      <input type="checkbox" id="darkModeSwitch" />
-      <label for="darkModeSwitch">Dark Mode</label>
-    </div>
     <!-- First input: Roll No -->
     <div class="input-group">
       <label for="psid">Roll No</label>
       <input type="text" id="psid" placeholder="Enter Roll No or list (comma-separated)" />
-      <div class="checkbox-group">
+      <div class="checkbox-inline">
         <input type="checkbox" id="listPsidsCheckbox" />
         <label for="listPsidsCheckbox">list: roll nos</label>
       </div>
     </div>
-
+  
     <!-- Second input: Link -->
     <div class="input-group">
       <label for="link">Link</label>
       <input type="text" id="link" placeholder="Enter URL e.g. http://aakashleap.com:3131/API/ResultRpt?rid=MSwxMDUyNTM0LDE0MTIzMTEyMTQ0MA%3D%3D" />
-      <div class="checkbox-group">
+      <div class="checkbox-inline">
         <input type="checkbox" id="listLinksCheckbox" />
         <label for="listLinksCheckbox">list: links</label>
       </div>
     </div>
-
+  
     <button class="btn" id="resultsBtn">Results</button>
     <div class="results-list" id="resultsList"></div>
   </div>
-
+  
   <script>
-    // Dark mode toggle
-    const darkModeSwitch = document.getElementById('darkModeSwitch');
-    darkModeSwitch.addEventListener('change', function () {
-      document.body.classList.toggle('dark-mode', darkModeSwitch.checked);
-    });
-
     // Function to generate new links based on inputs
     function generateLinks() {
       const rollInput = document.getElementById('psid').value;
@@ -191,46 +158,44 @@
       const listRollNos = document.getElementById('listPsidsCheckbox').checked;
       const listLinks = document.getElementById('listLinksCheckbox').checked;
       
-      // Get array of roll nos and links
+      // Split input values based on list flag
       const rollNos = listRollNos ? rollInput.split(',').map(x => x.trim()).filter(x => x) : [rollInput.trim()];
       const links = listLinks ? linkInput.split(',').map(x => x.trim()).filter(x => x) : [linkInput.trim()];
       
       const generatedLinks = [];
       
-      // Process each link
+      // Process each link provided
       links.forEach(link => {
         try {
           const urlObj = new URL(link);
-          // Get the rid parameter value from the URL
+          // Extract and decode the "rid" parameter from the URL
           let ridParam = urlObj.searchParams.get('rid') || "";
-          // Decode percent-encodings
           ridParam = decodeURIComponent(ridParam);
           // Remove trailing "==" if present
           if (ridParam.endsWith("==")) {
             ridParam = ridParam.slice(0, -2);
           }
           
-          // Decode the Base64 to get the raw string e.g., "1,testid,rollno"
+          // Decode Base64 string to retrieve raw content (format expected: "1,testid,rollno")
           let decoded;
           try {
             decoded = atob(ridParam);
           } catch (error) {
-            alert('Error decoding the Base64 string. Please check the input link.');
+            alert('Error decoding Base64 string. Check the input link.');
             return;
           }
+          
           const parts = decoded.split(',');
-          // Ensure the format is as expected (three parts)
           if (parts.length !== 3) {
-            alert('The decoded string does not have the expected format (1,testid,rollno).');
+            alert('Decoded string not in expected format (1,testid,rollno).');
             return;
           }
           const [part1, testId] = parts;
           
-          // For each Roll No provided, update the string and generate a new link.
+          // For each roll no provided, update the string, re-encode, and form a new link.
           rollNos.forEach(newRoll => {
             const newRaw = `${part1},${testId},${newRoll}`;
             const newEncoded = btoa(newRaw);
-            // Append the proper padding "==" and encode the full value
             const finalRid = encodeURIComponent(newEncoded + "==");
             urlObj.searchParams.set('rid', finalRid);
             generatedLinks.push(urlObj.toString());
@@ -246,18 +211,16 @@
     document.getElementById('resultsBtn').addEventListener('click', () => {
       const links = generateLinks();
       const resultsListDiv = document.getElementById('resultsList');
-      resultsListDiv.innerHTML = ""; // clear previous
+      resultsListDiv.innerHTML = "";
       
       if (links.length === 0) {
         resultsListDiv.innerHTML = "<p>No valid links generated.</p>";
         return;
       }
       
-      // If there's only one generated link, redirect immediately.
       if (links.length === 1) {
         window.location.href = links[0];
       } else {
-        // Otherwise, display all generated links.
         const info = document.createElement('p');
         info.textContent = "Multiple links generated:";
         resultsListDiv.appendChild(info);
